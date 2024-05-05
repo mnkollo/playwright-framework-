@@ -7,7 +7,7 @@ export class LoginPage {
         this.page = page
     }
 
-    async login(username,password, profileName){
+    async login(username: string,password: string, profileName: string){
         await this.page.goto('https://backoffice-dev.innovallc.com/login')
         await this.page.getByRole('textbox', {name: 'Username'}).fill(username)
         await this.page.getByRole('textbox', {name: 'Password'}).fill(password)
