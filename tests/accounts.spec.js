@@ -11,6 +11,6 @@ test.beforeEach('login',async ({ page}) => {
 test('Create Account', async ({ page }) => {
   const accountsPage = new AccountsPage(page);
 
-  await accountsPage.createAccount()
+  await accountsPage.createAccount('Pop Lock and Drop it')
 });
 
