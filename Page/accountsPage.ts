@@ -29,7 +29,7 @@ export class AccountsPage {
         await this.page.locator('[type="submit"]',{hasText: 'Save'}).click()
 
         //Check breadcrumb
-        expect(await this.page.locator('.breadcrumb').textContent()).toBe('AccountsAccount')
+        expect(await this.page.locator('.breadcrumb').textContent()).toBe('AccountsAccount') 
 
         
         
