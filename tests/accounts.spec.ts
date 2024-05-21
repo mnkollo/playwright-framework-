@@ -12,7 +12,15 @@ test.beforeEach('login',async ({ page}) => {
 test('Create Account', async ({ page }) => {
   const accountsPage = new AccountsPage(page);
   const accountName = faker.company.name();
+  const firstName = faker.name.firstName()
+  const lastName = faker.name.lastName()
+  const randomEmail = `${firstName}${lastName}${faker.random.numeric(5)}@test.com`
+  // const address = faker.address.streetAddress()
+  const address = '4700'
+  const city = faker.address.city()
+  const state = 'TX'
+  const zip = '75024'
 
-  await accountsPage.createAccount(accountName)
+  await accountsPage.createAccount(accountName,randomEmail,firstName,lastName,address,city,state,zip)
 });
 
