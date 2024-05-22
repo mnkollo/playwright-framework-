@@ -24,9 +24,6 @@ export class AccountsPage {
         await this.page.locator('#contactLastName').fill(lastName)
         await this.page.locator('#physicalLine1').fill(address)
         await this.page.getByText('4700 Argonne Dr, San Antonio, TX 78220').click()
-        //await this.page.locator('#physicalCity').fill(city)
-        //await this.page.locator('#physicalState').fill(state)
-       // await this.page.locator('#physicalPostalCode').fill(zip)
         await this.page.locator('[type="submit"]',{hasText: 'Save'}).click()
         await this.page.waitForTimeout(10000)
 
@@ -34,6 +31,7 @@ export class AccountsPage {
         //Check breadcrumb
         expect(await this.page.locator('.breadcrumb').textContent()).toBe('AccountsAccount')  
 
+        //Verify Account Created
         const accountName = await this.page.locator('.d-flex', { hasText: name }).textContent();
         expect(accountName).toContain(name.toUpperCase());
     }
