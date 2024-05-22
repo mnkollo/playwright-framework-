@@ -16,10 +16,10 @@ test('Create Account', async ({ page }) => {
   const lastName = faker.name.lastName()
   const randomEmail = `${firstName}${lastName}${faker.random.numeric(5)}@test.com`
   // const address = faker.address.streetAddress()
-  const address = '4700'
-  const city = faker.address.city()
+  const address = '4700 Argonne Dr'
+  const city = 'SAN ANTONIO'
   const state = 'TX'
-  const zip = '75024'
+  const zip = '78205'
 
   await accountsPage.createAccount(accountName,randomEmail,firstName,lastName,address,city,state,zip)
 });
