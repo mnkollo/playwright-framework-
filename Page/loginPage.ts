@@ -23,5 +23,9 @@ export class LoginPage {
         const header = await this.page.locator('.breadcrumb').textContent()
         expect(header).toBe('DashboardDashboard Not Configured')
     }   
+    async navigateToAccountsPage(){
+        await this.page.locator('[href="/crm/accounts"]').click()
+
+    }
 }
  

@@ -8,7 +8,6 @@ export class AccountsPage {
     }
 
     async createAccount(name: string,email: string,firstName: string,lastName: string,address: string,city: string,state: string,zip: string){
-        await this.page.locator('[href="/crm/accounts"]').click()
         await this.page.locator('[class="fa fa-plus fa-lg"]').click()
         await this.page.locator('#search_string').fill(name)
         await this.page.locator('.float-right').click()
@@ -36,6 +35,15 @@ export class AccountsPage {
 
         const accountName = await this.page.locator('.d-flex', { hasText: name }).textContent();
         expect(accountName).toContain(name.toUpperCase());
+    }
+    async addBankAccount(){
+        await this.page.locator('[class="a-table"]').first().click()
+        await this.page.locator('[class="fas fa-arrows-alt-h fa-lg"]').click()
+        await this.page.locator('[class="fa fa-cogs"]').click()
+    }
+    async searchAccount(accountName: string){
+        await this.page.locator('#simple-search-field').fill(accountName)
+        await this.page.locator('[class="btn-xs btn btn-primary"]').click()
     }
 }
  
