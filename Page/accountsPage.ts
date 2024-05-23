@@ -34,10 +34,34 @@ export class AccountsPage {
         const accountName = await this.page.locator('.d-flex', { hasText: name }).textContent();
         expect(accountName).toContain(name.toUpperCase());
     }
-    async addBankAccount(){
+    async addBankAccount(bankName: string,address: string,city: string,accountHolderName: string){
         await this.page.locator('[class="a-table"]').first().click()
         await this.page.locator('[class="fas fa-arrows-alt-h fa-lg"]').click()
-        await this.page.locator('[class="fa fa-cogs"]').click()
+        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
+        await this.page.waitForTimeout(5000)
+        await gearIcon.click()
+        await this.page.waitForTimeout(5000)
+        await this.page.locator('a',{hasText:' Add Bank Account'}).click()
+        await this.page.locator('#bankAddress').fill(address)
+        await this.page.locator('#bankName').fill(bankName)
+        await this.page.locator('#bankCity').fill(city)
+        await this.page.locator('[class$="ValueContainer"]').first().click()
+        await this.page.getByText('Texas').click()
+        await this.page.locator('#bankZipCode').fill('76125')
+        await this.page.locator('#bankAccountHolderName').fill(accountHolderName)
+        await this.page.locator('#routingNumber').fill('54321')
+        await this.page.locator('#accountNumber').fill('t123445')
+        await this.page.locator('[class$="ValueContainer"]').last().click()
+        await this.page.locator('#react-select-5-option-1',{hasText: 'Saving'}).click()
+        await this.page.locator('button',{hasText:'Save'}).click()
+        await this.page.locator('#bankInformation').click()
+
+        // get the table
+        const bankTable = this.page.locator('tbody tr',{hasText: accountHolderName});
+
+        // Validate the number of rows and columns
+        const cellValues = await bankTable.locator('td').allTextContents();
+        expect(cellValues[7]).toBe(accountHolderName)
     }
     async searchAccount(accountName: string){
         await this.page.locator('#simple-search-field').fill(accountName)

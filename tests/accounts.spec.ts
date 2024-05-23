@@ -25,8 +25,9 @@ test('Create Account', async ({ page }) => {
 });
 test('Add Bank Account', async ({ page }) => {
   const accountsPage = new AccountsPage(page)
+  const accountHolderName = faker.name.jobDescriptor()
 
-  await accountsPage.searchAccount(accountName)
-  await accountsPage.addBankAccount()
+  await accountsPage.searchAccount('SONS')
+  await accountsPage.addBankAccount('Chase','55500 Ocean Dr','fort worth',accountHolderName)
 })
 
