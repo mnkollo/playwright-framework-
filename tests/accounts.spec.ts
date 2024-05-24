@@ -27,7 +27,13 @@ test('Add Bank Account', async ({ page }) => {
   const accountsPage = new AccountsPage(page)
   const accountHolderName = faker.name.jobDescriptor()
 
-  await accountsPage.searchAccount('SONS')
+  await accountsPage.searchAccount('ABBOTT - HERMISTON')
   await accountsPage.addBankAccount('Chase','55500 Ocean Dr','fort worth',accountHolderName)
+})
+test('Add Account Note', async ({ page }) => {
+  const accountsPage = new AccountsPage(page)
+
+  await accountsPage.searchAccount('ABBOTT - HERMISTON')
+  await accountsPage.addNoteToAccount()
 })
 

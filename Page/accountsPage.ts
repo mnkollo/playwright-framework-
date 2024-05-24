@@ -35,12 +35,11 @@ export class AccountsPage {
         expect(accountName).toContain(name.toUpperCase());
     }
     async addBankAccount(bankName: string,address: string,city: string,accountHolderName: string){
-        await this.page.locator('[class="a-table"]').first().click()
         await this.page.locator('[class="fas fa-arrows-alt-h fa-lg"]').click()
         const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
-        await this.page.waitForTimeout(5000)
+        //await this.page.waitForTimeout(5000)
         await gearIcon.click()
-        await this.page.waitForTimeout(5000)
+        //await this.page.waitForTimeout(5000)
         await this.page.locator('a',{hasText:' Add Bank Account'}).click()
         await this.page.locator('#bankAddress').fill(address)
         await this.page.locator('#bankName').fill(bankName)
@@ -63,9 +62,25 @@ export class AccountsPage {
         const cellValues = await bankTable.locator('td').allTextContents();
         expect(cellValues[7]).toBe(accountHolderName)
     }
+    async addNoteToAccount(){
+        await this.page.locator('[class="fas fa-arrows-alt-h fa-lg"]').click()
+        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
+        //await this.page.waitForTimeout(5000)
+        await gearIcon.click()
+        //await this.page.waitForTimeout(5000)
+        await this.page.locator('a',{hasText:' Add Internal Note'}).click()
+
+        const addAccountNoteModal = this.page.locator('.modal-content',{hasText: 'Add Account Note'})
+        await addAccountNoteModal.locator('[name="text"]').fill('Apples!')
+        await this.page.locator('button',{hasText:'Save'}).click()
+
+        const note = await this.page.locator('span p',{hasText:'Apples!'}).textContent()
+        expect(note).toContain('Apples!')
+    }
     async searchAccount(accountName: string){
         await this.page.locator('#simple-search-field').fill(accountName)
-        await this.page.locator('[class="btn-xs btn btn-primary"]').click()
+        await this.page.locator('button',{hasText: 'Search'}).click()
+        await this.page.locator('[class="a-table"]',{hasText: accountName}).first().click()
     }
 }
  
