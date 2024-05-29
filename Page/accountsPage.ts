@@ -1,6 +1,8 @@
 import {Page, expect} from '@playwright/test'
+import { TIMEOUT } from 'dns'
 
 export class AccountsPage {
+
     readonly page: Page
 
     constructor(page: Page) {
@@ -37,9 +39,9 @@ export class AccountsPage {
     async addBankAccount(bankName: string,address: string,city: string,accountHolderName: string){
         await this.page.locator('[class="fas fa-arrows-alt-h fa-lg"]').click()
         const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
-        //await this.page.waitForTimeout(5000)
+        await this.page.waitForTimeout(5000)
         await gearIcon.click()
-        //await this.page.waitForTimeout(5000)
+        await this.page.waitForTimeout(5000)
         await this.page.locator('a',{hasText:' Add Bank Account'}).click()
         await this.page.locator('#bankAddress').fill(address)
         await this.page.locator('#bankName').fill(bankName)
@@ -65,9 +67,9 @@ export class AccountsPage {
     async addNoteToAccount(){
         await this.page.locator('[class="fas fa-arrows-alt-h fa-lg"]').click()
         const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
-        //await this.page.waitForTimeout(5000)
+        await this.page.waitForTimeout(5000)
         await gearIcon.click()
-        //await this.page.waitForTimeout(5000)
+        await this.page.waitForTimeout(5000)
         await this.page.locator('a',{hasText:' Add Internal Note'}).click()
 
         const addAccountNoteModal = this.page.locator('.modal-content',{hasText: 'Add Account Note'})
@@ -79,7 +81,9 @@ export class AccountsPage {
     }
     async searchAccount(accountName: string){
         await this.page.locator('#simple-search-field').fill(accountName)
+        await this.page.waitForTimeout(5000)
         await this.page.locator('button',{hasText: 'Search'}).click()
+        await this.page.waitForTimeout(5000)
         await this.page.locator('[class="a-table"]',{hasText: accountName}).first().click()
     }
 }
