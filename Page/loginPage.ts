@@ -27,5 +27,11 @@ export class LoginPage {
         await this.page.locator('[href="/crm/accounts"]').click()
 
     }
+    async navigateToPacakagePage(){
+
+
+
+        
+    }
 }
  

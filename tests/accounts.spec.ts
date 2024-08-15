@@ -6,6 +6,7 @@ import { AccountsPage } from '../Page/accountsPage';
 import {faker} from '@faker-js/faker'
 
 let accountName = faker.company.companyName();
+let accountName1 = accountName;
 
 test.beforeEach('login',async ({ page}) => {
 
@@ -23,20 +24,20 @@ test('Create Account', async ({ page }) => {
   const city = 'SAN ANTONIO'
   const state = 'TX'
   const zip = '78205'
-  await pm.navigateTo().createAccount(accountName,randomEmail,firstName,lastName,address,city,state,zip)
+  await pm.navigateTo().createAccount(accountName1,randomEmail,firstName,lastName,address,city,state,zip)
 });
 test('Add Bank Account', async ({ page }) => {
   const pm = new PageManager(page)
 
   const accountHolderName = faker.name.jobDescriptor()
 
-  await pm.navigateTo().searchAccount(accountName)
+  await pm.navigateTo().searchAccount(accountName1)
   await pm.navigateTo().addBankAccount('Chase','55500 Ocean Dr','fort worth',accountHolderName)
 })
 test('Add Account Note', async ({ page }) => {
   const accountsPage = new AccountsPage(page)
   const pm = new PageManager(page)
-  await pm.navigateTo().searchAccount(accountName)
+  await pm.navigateTo().searchAccount(accountName1)
   await pm.navigateTo().addNoteToAccount()
 })
 
