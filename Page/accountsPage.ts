@@ -1,12 +1,10 @@
 import { Page, expect } from '@playwright/test'
-import { TIMEOUT } from 'dns'
+import { HelperBase } from './helperBase'
 
-export class AccountsPage {
-
-    readonly page: Page
+export class AccountsPage extends HelperBase {
 
     constructor(page: Page) {
-        this.page = page
+        super(page)
     }
 
     async createAccount(name: string, email: string, firstName: string, lastName: string, address: string, city: string, state: string, zip: string) {
@@ -223,7 +221,7 @@ export class AccountsPage {
     }
 
     // Helper function to fill form fields
-    async fillFormField(labelText: string, value: string) {
+    private async fillFormField(labelText: string, value: string) {
         const fieldLocator = this.page.locator('.position-relative', { hasText: labelText })
         const isDropdown = await fieldLocator.evaluate((el) => el.tagName.toLowerCase() === 'select'); // Check if the field is a dropdown
         if(isDropdown){
@@ -232,11 +230,5 @@ export class AccountsPage {
         await fieldLocator.locator('.input-xs').fill(value);
         }
     }
-    async clickToggleButton() {
-        const toggleButton = await this.page.waitForSelector('[class="fas fa-arrows-alt-h fa-lg"]', { timeout: 5000 });
-        if (!(await toggleButton.isVisible())) {
-            throw new Error('Toggle button is not visible or not found.');
-        }
-        await toggleButton.click();
-    }
+    
 } 

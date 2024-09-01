@@ -1,10 +1,10 @@
 import {Page, expect} from '@playwright/test'
+import { HelperBase } from './helperBase'
 
-export class LoginPage {
-    readonly page: Page
+export class LoginPage extends HelperBase {
 
     constructor(page: Page) {
-        this.page = page
+        super(page)
     }
 
     async login(url: string, username: string, password: string, test: string) {

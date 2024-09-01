@@ -1,11 +1,10 @@
 import { Page, expect } from '@playwright/test'
+import { HelperBase } from './helperBase'
 
-export class PackagesPage {
-
-    readonly page: Page
+export class PackagesPage extends HelperBase {
 
     constructor(page: Page) {
-        this.page = page
+        super(page)
     }
 
     async createPackage(){
