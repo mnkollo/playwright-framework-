@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-import { PageManager } from '../Page/pageManager'
+import { PageManager } from '../../Page/pageManager'
 import { faker } from '@faker-js/faker'
 
 let accountName = '';

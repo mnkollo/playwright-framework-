@@ -1,7 +1,7 @@
 // @ts-check
-import { PageManager } from '../Page/pageManager'
+import { PageManager } from '../../Page/pageManager'
 import { faker } from '@faker-js/faker'
-import { test } from '../test-options'
+import { test } from '../../test-options'
 
 let accountName = '';
 
