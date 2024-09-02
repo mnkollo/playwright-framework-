@@ -57,8 +57,7 @@ export class AccountsPageAPI extends HelperBase {
             const accountID = responseBody.account_ID;
             console.log(`Account ID: ${accountID}`);
 
-            // Store the accountID in the shared context
-            if (setAccountID) { setAccountID(accountID); }
+            if (setAccountID) { setAccountID(accountID); }              // Store the accountID in the shared context
         } catch (error) {
             console.error('Error creating account:', error);
             throw error;
@@ -124,6 +123,34 @@ export class AccountsPageAPI extends HelperBase {
             expect(responseBody).toHaveProperty('text', payload.text);
         }
         catch (error) {
+                console.error('Error creating note:', error);
+                throw error;
+            }
+        }
+        async addCollectionsNoteToAccount(request: APIRequestContext, accessToken: string, accountID: number, userName: string) {
+            const payload = {
+                "module_ID":5,
+                "account_ID":accountID,
+                "invoice_ID":0,
+                "text":"testing add collections notes test"
+            };
+            try {
+                const response = await request.post(`https://innova-app-api-regression.azurewebsites.net/api/v1/System/CreateGeneralNote`, {
+                    data: payload,
+                    headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                    }
+                });
+                expect(response.status()).toEqual(200);
+                const responseBody = await response.json();
+                expect(responseBody).toHaveProperty('text', payload.text);
+                expect(responseBody).toHaveProperty('userName', userName);  
+                const createdDateTime = responseBody.createdDateTime;
+                const datePart = createdDateTime.split('T')[0];
+                expect(datePart).toEqual(new Date().toISOString().split('T')[0]);
+            }
+            catch (error) {
                 console.error('Error creating note:', error);
                 throw error;
             }

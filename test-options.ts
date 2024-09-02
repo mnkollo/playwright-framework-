@@ -4,6 +4,7 @@ import { PageManager } from './Page/pageManager'
 export type TestOptions = {
   auctionSite: string;
   login: string;
+  loginAPI: string;
   accountID?: number;  // Add accountID to the TestOptions type
   setAccountID?: (id: number) => void;  // Add setAccountID to the TestOptions type
 }
@@ -24,11 +25,25 @@ export const test = base.extend<TestOptions>({
     await use('')
   },
 
+  loginAPI: async ({ request }, use) => {
+    const response = await request.post('https://innova-app-api-regression.azurewebsites.net/api/Token/v2', {
+      data: {
+        "grant_Type": "password",
+        "user_Name": process.env.USERNAME,
+        "password": process.env.PASSWORD,
+        "impersonate_ID": "5F026EFC-C31F-4AA6-8EA2-A3A902AC4B33",
+        "route_ID": 1
+      }
+    });
+    const responseBody = await response.json()
+    const accessToken = responseBody.token
 
-  accountID: async ({ }, use) => {
+    await use(accessToken); // Pass accessToken to test context
+  },
+  accountID: async ({}, use) => {
     await use(accountID);
   },
-  setAccountID: async ({ }, use) => {   // This fixture sets the accountID
+  setAccountID: async ({}, use) => {   // This fixture sets the accountID
     await use((id) => {
       accountID = id;
     });
