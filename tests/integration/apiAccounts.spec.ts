@@ -4,6 +4,7 @@ import { test } from '../../test-options'
 import { expect } from 'playwright/test'
 
 let accessToken = '';
+
 test.describe('login', () => {
   test.beforeEach('login', async ({ page, request }) => {
     const response = await request.post('https://innova-app-api-regression.azurewebsites.net/api/Token/v2', {
@@ -13,7 +14,7 @@ test.describe('login', () => {
     const responseBody = await response.json()
     accessToken = responseBody.token
   })
-  test('Verify able to create Business Account with all fields', async ({ page, request }) => {
+  test('Verify able to create Business Account with all fields', async ({ request,setAccountID }) => {
 
      const response = await request.post('https://innova-app-api-regression.azurewebsites.net/api/v1/Account/Create', {
       data: {
@@ -59,9 +60,22 @@ test.describe('login', () => {
      expect(response.status()).toEqual(200)
 
      const responseBody = await response.json()
-     const accountID = responseBody.account_ID
+      const accountID = responseBody.account_ID
      console.log(`Account ID: ${accountID}`)
       // Store the accountID in the shared context
-     test.info().annotations.push({ type: 'accountID', description: accountID });
+      if (setAccountID) {setAccountID(accountID);}
+
+  })
+  test('Add Bank Account', async ({request, accountID }) => {
+    const response = await request.post('https://innova-app-api-regression.azurewebsites.net/api/v1/account/CreateBankAccount', {
+      data: {"id":0,"name":"chase","address":"2334 test dr","city":"Plano","state":"TX","zip":"75024","country_ID":0,"account_ID":accountID,"holderName":"michael","bankAccountType_ID":1,"routingNumber":"34322334","accountNumber":"432254342","specialInstructions":"","startDate":"2024-09-01","stopDate":"2024-09-01"},
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    expect(response.status()).toEqual(200)
+    const responseBody = await response.json()
+    console.log(responseBody)
   })
 })

@@ -5,8 +5,10 @@ export type TestOptions = {
     auctionSite: string;
     login: string;
     accountID?: string;  // Add accountID to the TestOptions type
+    setAccountID?: (id: string) => void;  // Add setAccountID to the TestOptions type
 }
 
+let accountID = '';
 export const test = base.extend<TestOptions> ({
     auctionSite: ['', {option: true}],  // Define the option
     
@@ -21,18 +23,14 @@ export const test = base.extend<TestOptions> ({
     await use('')
     },
 
-    accountID: async ({}, use, testInfo) => {
-        // Retrieve accountID from the test annotations
-        const accountIDAnnotation = testInfo.annotations.find(a => a.type === 'accountID');
-        const accountID = accountIDAnnotation ? accountIDAnnotation.description : null;
-
-        if (accountID) {
-            console.log(`Retrieved accountID from spec: ${accountID}`);
-            await use(accountID);
-        } else {
-            // If no accountID is found, handle the scenario
-            await use('');
-        }
-    }
-});
+    accountID: async ({}, use) => {
+        await use(accountID);
+      },
+      // This fixture sets the accountID
+      setAccountID: async ({}, use) => {
+        await use((id) => {
+          accountID = id;
+        });
+      },
+    });
 
