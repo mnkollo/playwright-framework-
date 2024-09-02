@@ -4,6 +4,7 @@ import { PageManager } from './Page/pageManager'
 export type TestOptions = {
     auctionSite: string;
     login: string;
+    accountID?: string;  // Add accountID to the TestOptions type
 }
 
 export const test = base.extend<TestOptions> ({
@@ -18,6 +19,20 @@ export const test = base.extend<TestOptions> ({
 
     await pm.onLoginPage().login(url,username,password,user)
     await use('')
+    },
+
+    accountID: async ({}, use, testInfo) => {
+        // Retrieve accountID from the test annotations
+        const accountIDAnnotation = testInfo.annotations.find(a => a.type === 'accountID');
+        const accountID = accountIDAnnotation ? accountIDAnnotation.description : null;
+
+        if (accountID) {
+            console.log(`Retrieved accountID from spec: ${accountID}`);
+            await use(accountID);
+        } else {
+            // If no accountID is found, handle the scenario
+            await use('');
+        }
     }
 });
 
