@@ -273,7 +273,7 @@ export class AccountsPage extends HelperBase {
             await this.saveButton();
 
             // Verify the document was uploaded
-            await this.verifyDocumentUpload(description[i], types[i]);
+            await this.verifyDocumentUpload(types[i],description[i]);
         }
     }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
