@@ -51,7 +51,7 @@ test.describe('Accounts', () => {
     const department = faker.name.jobArea()
     const defaultContact = 'Yes'
     const contactType = 'Decision Maker'
-    const email = `${firstName}.${lastName}${faker.random.numeric(5)}@mailinator.com`
+    const email = `${faker.name.jobDescriptor()}${faker.random.numeric(5)}@mailinator.com`
 
     await pm.onAccountsPage().searchAccount(accountName)
     await pm.onAccountsPage().addAdditionalContact(email, firstName, lastName, title, department, defaultContact, contactType)
@@ -83,7 +83,7 @@ test.describe('Accounts', () => {
   })
   test('TC-3486 Verify user can upload document on Account page', async ({ page}) => {
     const pm = new PageManager(page)
-      
+
       await pm.onAccountsPage().searchAccount(accountName)
       await pm.onAccountsPage().uploadDocument()
   })

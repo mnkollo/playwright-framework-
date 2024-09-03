@@ -13,4 +13,7 @@ export class HelperBase {
         }
         await toggleButton.click();
     }
+    async saveButton(){
+        await this.page.locator('button', { hasText: 'Save' }).click()
+    }
 }

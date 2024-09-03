@@ -29,7 +29,8 @@ export default defineConfig<TestOptions>({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'https://backoffice-reg.innovallc.com/login',
     auctionSite: 'https://auction-reg.innovallc.com/',
-
+    viewport: { width: 1280, height: 720 },
+    
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },

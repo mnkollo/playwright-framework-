@@ -1,5 +1,7 @@
 import { Page, expect } from '@playwright/test'
 import { HelperBase } from './helperBase'
+import { faker } from '@faker-js/faker'
+
 
 export class AccountsPage extends HelperBase {
 
@@ -49,7 +51,7 @@ export class AccountsPage extends HelperBase {
         await this.page.locator('#accountNumber').fill('t123445')
         await this.page.locator('[class$="ValueContainer"]').last().click()
         await this.page.getByText('Saving').click()
-        await this.page.locator('button', { hasText: 'Save' }).click()
+        await this.saveButton()
         await this.page.locator('#bankInformation').click()
 
         // get the table
@@ -67,7 +69,7 @@ export class AccountsPage extends HelperBase {
 
         const addAccountNoteModal = this.page.locator('.modal-content', { hasText: 'Add Account Note' })
         await addAccountNoteModal.locator('[name="text"]').fill(message)
-        await this.page.locator('button', { hasText: 'Save' }).click()
+        await this.saveButton()
 
         const note = await this.page.locator('span p', { hasText: message }).textContent()
         expect(note).toContain(message)
@@ -147,7 +149,7 @@ export class AccountsPage extends HelperBase {
         if (contactStatus === 'true') {
             await this.page.locator('[name="isActive"]').selectOption(status)
         }
-        await this.page.locator('button', { hasText: 'Save' }).click()
+        await this.saveButton()
     }
     async verifyBuyingEnabled(status: string) {
         await this.clickToggleButton()
@@ -192,7 +194,12 @@ export class AccountsPage extends HelperBase {
         await gearIcon.click();
 
         //Navigate To Location Modal
-        await this.page.locator('a', { hasText: ' Add Location' }).click()
+        try {
+            await this.page.locator('a', { hasText: ' Add Location' }).click()
+        } catch (error) {
+            console.error('Failed to click on upload document link:', error);
+            throw error;
+        }
 
         // Fill out the form using helper functions to make the code more readable
         const formFields = [
@@ -219,16 +226,85 @@ export class AccountsPage extends HelperBase {
         const locationCard = this.page.locator('.card-title', { hasText: name });
         await expect(locationCard).toHaveText(name, { timeout: 5000 });
     }
+    async uploadDocument() {
+        await this.clickToggleButton();
+        const uploadDocuments = ['tests/uploadFiles/beigeCouch.png', 'tests/uploadFiles/livingRoomIdeas.png'];
+        const types = ['Copy Of Title', 'Contract'];
+        const description = [faker.random.words(2), faker.random.words(3)];
 
+        if (uploadDocuments.length !== types.length || types.length !== description.length) {
+            throw new Error('Mismatch in the number of upload documents, types, and descriptions');
+        }
+
+        for (let i = 0; i < uploadDocuments.length; i++) {
+            // Open the gear icon menu
+            const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000, state: 'visible' });
+            await gearIcon.click();
+
+            // Click the upload document link
+            try {
+                await this.page.locator('a', { hasText: ' Upload Document' }).click();
+            } catch (error) {
+                console.error('Failed to click on upload document link:', error);
+                throw error;
+            }
+
+            // Fill in the document description
+            try {
+                await this.page.locator('#description').fill(description[i]);
+            } catch (error) {
+                console.error('Failed to fill document description:', error);
+                throw error;
+            }
+
+            // Select the document type
+            try {
+                await this.page.locator('[name="documentType_ID"]').selectOption(types[i]);
+            } catch (error) {
+                console.error('Failed to select document type:', error);
+                throw error;
+            }
+
+            // Upload the document
+            const browseLink = await this.page.waitForSelector('[class="filepond--label-action"]', { timeout: 10000 });
+            await browseLink.setInputFiles(uploadDocuments[i]);
+
+            // Save the document
+            await this.saveButton();
+
+            // Verify the document was uploaded
+            await this.verifyDocumentUpload(description[i], types[i]);
+        }
+    }
+    private async verifyDocumentUpload(description: unknown, type: unknown) {
+        const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 5000 });
+        await documentAccordion.click();
+    
+        const documentRow = this.page.locator('[data-tip="Download"]').last();
+        await documentRow.waitFor({ state: 'visible' });
+    
+        const documentDescription = await documentRow.locator('td').nth(1).textContent();
+        expect(documentDescription).toContain(description);
+    
+        const documentType = await documentRow.locator('td').nth(0).textContent();
+        expect(documentType).toContain(type);
+    }
     // Helper function to fill form fields
     private async fillFormField(labelText: string, value: string) {
         const fieldLocator = this.page.locator('.position-relative', { hasText: labelText })
         const isDropdown = await fieldLocator.evaluate((el) => el.tagName.toLowerCase() === 'select'); // Check if the field is a dropdown
-        if(isDropdown){
+        if (isDropdown) {
             await fieldLocator.locator('.input-xs').selectOption(value);
         } else {
-        await fieldLocator.locator('.input-xs').fill(value);
+            await fieldLocator.locator('.input-xs').fill(value);
         }
     }
-    
+    private async openAccountActionsMenuFromCollectionsView() {
+        // Click on toggle button
+        await this.clickToggleButton()
+
+        // Wait for the gear icon and click it
+        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000 });
+        await gearIcon.click();
+    }
 } 
