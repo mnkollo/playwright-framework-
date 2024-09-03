@@ -237,11 +237,11 @@ export class AccountsPage extends HelperBase {
         }
 
         for (let i = 0; i < uploadDocuments.length; i++) {
-            // Open the gear icon menu
+            // Open the gear icon menu on Accounts page
             const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000, state: 'visible' });
             await gearIcon.click();
 
-            // Click the upload document link
+            // Click the upload document tab
             try {
                 await this.page.locator('a', { hasText: ' Upload Document' }).click();
             } catch (error) {
@@ -276,18 +276,20 @@ export class AccountsPage extends HelperBase {
             await this.verifyDocumentUpload(description[i], types[i]);
         }
     }
-    private async verifyDocumentUpload(description: unknown, type: unknown) {
+    private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 5000 });
         await documentAccordion.click();
-    
+
         const documentRow = this.page.locator('[data-tip="Download"]').last();
         await documentRow.waitFor({ state: 'visible' });
-    
-        const documentDescription = await documentRow.locator('td').nth(1).textContent();
-        expect(documentDescription).toContain(description);
-    
+
         const documentType = await documentRow.locator('td').nth(0).textContent();
         expect(documentType).toContain(type);
+
+        const documentDescription = await documentRow.locator('td').nth(1).textContent();
+        expect(documentDescription).toContain(description);
+
+
     }
     // Helper function to fill form fields
     private async fillFormField(labelText: string, value: string) {
