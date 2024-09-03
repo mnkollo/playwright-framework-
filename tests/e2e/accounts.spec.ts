@@ -5,7 +5,7 @@ import { test } from '../../test-options'
 
 let accountName = '';
 
-test.describe('Accounts', () => {
+test.describe('Actions with Accounts', () => {
   test.beforeEach('login', async ({ page,login }) => {
     const pm = new PageManager(page)
     await pm.onHomePage().navigateToAccountsPage()
