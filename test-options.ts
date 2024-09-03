@@ -7,12 +7,15 @@ export type TestOptions = {
   loginAPI: string;
   accountID?: number;  // Add accountID to the TestOptions type
   contactID?: number;  // Add contactID to the TestOptions type
+  locationID?: number;  // Add locationID to the TestOptions type
   setContactID?: (id: number) => void;  // Add setContactID to the TestOptions type
   setAccountID?: (id: number) => void;  // Add setAccountID to the TestOptions type
+  setLocationID?: (id: number) => void;  // Add setLocationID to the TestOptions type
 }
 
 let accountID = 0;
 let contactID = 0;
+let locationID = 0;
 export const test = base.extend<TestOptions>({
   auctionSite: ['', { option: true }],  // Define the option
 
@@ -50,14 +53,20 @@ export const test = base.extend<TestOptions>({
       accountID = id;
     });
   },
-
-
   contactID: async ({}, use) => {
     await use(contactID);
   },
   setContactID: async ({}, use) => {   // This fixture sets the accountID
     await use((id) => {
       contactID = id;
+    });
+  },
+  locationID: async ({}, use) => {
+    await use(locationID);
+  },
+  setLocationID: async ({}, use) => {   // This fixture sets the accountID
+    await use((id) => {
+      locationID = id;
     });
   },
 });

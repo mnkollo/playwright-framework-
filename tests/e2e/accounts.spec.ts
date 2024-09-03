@@ -81,4 +81,10 @@ test.describe('Accounts', () => {
     await pm.onAccountsPage().searchAccount(accountName)
     await pm.onAccountsPage().verifyAbleToCreateLocation(locationType,locationName,address,city, state, zip, phone)
   })
+  test('TC-3486 Verify user can upload document on Account page', async ({ page}) => {
+    const pm = new PageManager(page)
+      
+      await pm.onAccountsPage().searchAccount(accountName)
+      await pm.onAccountsPage().uploadDocument()
+  })
 })

@@ -392,4 +392,228 @@ export class AccountsPageAPI extends HelperBase {
             throw error;
         }
     }
+    async addLocationToAccount(request: APIRequestContext, accessToken: string, accountID: number, contactID: number, setLocationID?: (id: number) => void) {
+        const payload = {
+            isJumpStartAvailable: false,
+            isLoadingDockAvailable: false,
+            isForkLiftAvailable: false,
+            isNoticeRequiredToView: false,
+            isLoadOutAssistanceAvailable: false,
+            hasSiteRestrictions: false,
+            hasSpecialInstructions: false,
+            type_ID: 0,
+            isActive: true,
+            country: "",
+            addressLine1: `${faker.address.streetAddress()}`,
+            city: "San Antonio",
+            countyName: "Bexar",
+            state: "TX",
+            postalCode: "78245",
+            phone: `${faker.phone.number()}`,
+            locationName: `${faker.company.name()} location`,
+            notes: `${faker.random.words(5)} testing notes`,
+            contact_ID: contactID.toString(),
+            country_ID: 0,
+            account_ID: accountID.toString(),
+            hoursOfOperation: [
+                {
+                    dayOfWeek_ID: 0,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 1,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 2,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 3,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 4,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 5,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 6,
+                    hourType_ID: 1,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                }
+            ],
+            previewStarts: null,
+            previewHours: [
+                {
+                    dayOfWeek_ID: 0,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 1,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 2,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 3,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 4,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 5,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                },
+                {
+                    dayOfWeek_ID: 6,
+                    hourType_ID: 2,
+                    fromHour: "9",
+                    fromMinute: "0",
+                    fromMeridiem: "0",
+                    hasHours: false,
+                    toHour: "3",
+                    toMinute: "0",
+                    toMeridiem: "1",
+                    hourAvailabilityType_ID: 0
+                }
+            ]
+        };
+        try {
+            const response = await request.post(`https://innova-app-api-regression.azurewebsites.net/api/v1/account/createLocation`, {
+                data: payload,
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            expect(response.status()).toEqual(200);
+            const responseBody = await response.json();
+            expect(responseBody).toHaveProperty('location_ID');
+            expect(responseBody).toHaveProperty('locationName', payload.locationName);
+            expect(responseBody).toHaveProperty('addressLine1', payload.addressLine1);
+            expect(responseBody).toHaveProperty('addressLine3', 'United States');
+
+
+            console.log(`Location ID: ${responseBody.location_ID}`);
+
+                if (setLocationID) {
+                    setLocationID(responseBody.location_ID);
+                }             // Store the contactID in the shared context
+        }
+        catch (error) {
+            console.error('Error creating location:', error);
+            throw error;
+        }
+    }
 }
