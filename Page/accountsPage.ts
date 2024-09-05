@@ -1,6 +1,8 @@
 import { Page, expect } from '@playwright/test'
 import { HelperBase } from './helperBase'
 import { faker } from '@faker-js/faker'
+const fs = require('fs');
+
 
 
 export class AccountsPage extends HelperBase {
@@ -34,6 +36,10 @@ export class AccountsPage extends HelperBase {
         //Verify Account Created
         const accountName = await this.page.locator('.d-flex', { hasText: name }).textContent();
         expect(accountName).toContain(name.toUpperCase());
+
+        // Save the contact info to a file
+        const contactInfo = { firstName, lastName };
+        fs.writeFileSync('contactData.json', JSON.stringify(contactInfo));
     }
     async addBankAccount(bankName: string, address: string, city: string, accountHolderName: string) {
         await this.clickToggleButton()
@@ -214,9 +220,9 @@ export class AccountsPage extends HelperBase {
             await this.fillFormField(field.label, field.value);
         }
         // Check if the save button is enabled before clicking
-        const saveButton = this.page.locator('[class="fa fa-save fa-lg"]');
-        await expect(saveButton).toBeEnabled({ timeout: 5000 });
-        await saveButton.click();
+        const saveIcon = this.page.locator('[class="fa fa-save fa-lg"]');
+        await expect(saveIcon).toBeEnabled({ timeout: 5000 });
+        await saveIcon.click();
 
         // Post-save action to refresh the location list
         await this.clickToggleButton()
@@ -273,15 +279,71 @@ export class AccountsPage extends HelperBase {
             await this.saveButton();
 
             // Verify the document was uploaded
-            await this.verifyDocumentUpload(types[i],description[i]);
+            await this.verifyDocumentUpload(types[i], description[i]);
         }
+    }
+    async deleteDocument(deletedDocs: number) {
+        await this.clickToggleButton();
+
+        // Wait for the document accordion and ensure it is visible
+        const documentAccordion = await this.page.waitForSelector('#documents', { state: 'visible' });
+        await documentAccordion.click();
+
+        // Get all document rows with 'Download' tooltip
+        const documentRows = this.page.locator('[data-tip="Download"]');
+
+        // Check if there are at least two items to delete
+        const documentCount = await documentRows.count();
+        if (documentCount < deletedDocs) {
+            throw new Error("Not enough documents to delete.");
+        }
+        for (let i = 0; i < deletedDocs; i++) {
+            const documentRow = documentRows.nth(documentCount - i - 1);  // Get the last or second-to-last row
+            await documentRow.waitFor({ state: 'attached' });  // Ensure the row is attached to the DOM
+            await documentRow.locator('td').nth(4).click();  // Click the delete button in the correct column
+
+            // Confirm the deletion by clicking the yes button
+            await this.yesButton();
+
+            // Verify the success message appears after each deletion
+            const successMessage = await this.page.waitForSelector('text=Success!', { state: 'visible' });
+            const messageText = await successMessage.textContent();
+
+            // Assert the success message is shown
+            expect(messageText).toBeTruthy();
+        }
+    }
+    async createSalesAgreement(storedContact: string, address: string,taxIDType: string, bankAccount: string, companyName: string,dbaNames: string, payableToName: string, taxIDNumber: string) {   
+        this.openAccountActionsMenuFromCollectionsView()
+
+        // Click on the 'Create Sales Agreement' tab
+        const salesAgreementTab = this.page.locator('a', { hasText: 'Create Sales Agreement' });
+        await salesAgreementTab.waitFor({ state: 'visible' });
+        await salesAgreementTab.click();
+
+        // Fill the sales agreement form
+        await this.fillSalesAgreementForm(storedContact,address,taxIDType, bankAccount, companyName, dbaNames, payableToName, taxIDNumber)
+
+        // Save the form
+        const saveIcon = this.page.locator('[class="fa fa-save fa-lg"]');
+        await expect(saveIcon).toBeEnabled({ timeout: 5000 });
+        await saveIcon.click();
+
+        // Verify the success message
+        const successMessage = await this.page.getByText('Success!').textContent()
+        expect(successMessage).toBeTruthy()
+
+        this.clickToggleButton()
+        await this.page.locator('ol [class="breadcrumb-item"]').last().click();
+        const salesAgreementCreated = await this.page.locator('[class="card-title no-border"]', { hasText: 'Sales Agreement Term'}).textContent();
+        expect(salesAgreementCreated?.trim()).toContain('Sales Agreement Term');
     }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 5000 });
         await documentAccordion.click();
 
         const documentRow = this.page.locator('[data-tip="Download"]').last();
-        await documentRow.waitFor({ state: 'visible' });
+        await documentRow.waitFor({ state: 'attached' });
 
         const documentType = await documentRow.locator('td').nth(0).textContent();
         expect(documentType).toContain(type);
@@ -289,7 +351,16 @@ export class AccountsPage extends HelperBase {
         const documentDescription = await documentRow.locator('td').nth(1).textContent();
         expect(documentDescription).toContain(description);
 
-
+    }
+    private async fillSalesAgreementForm(storedContact:string,address: string, taxIDType: string, bankAccount: string, companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
+        await this.page.locator('#sellerContactID').selectOption(storedContact)
+        await this.page.locator('#paymentAddressID').selectOption(address)
+        await this.page.locator('#taxIDTypeID').selectOption(taxIDType)
+        await this.page.locator('#bankAccount_ID').selectOption(bankAccount)
+        await this.page.locator('#sellerLegalName').fill(companyName)
+        await this.page.locator('#dbaNames').fill(dbaNames)
+        await this.page.locator('#payableToName').fill(payableToName)
+        await this.page.locator('#taxIDNumber').fill(taxIDNumber)
     }
     // Helper function to fill form fields
     private async fillFormField(labelText: string, value: string) {

@@ -14,6 +14,11 @@ export class HelperBase {
         await toggleButton.click();
     }
     async saveButton(){
-        await this.page.locator('button', { hasText: 'Save' }).click()
+        const saveButton = this.page.locator('button', { hasText: 'Save' });
+        await saveButton.click();
+    }
+    async yesButton(){
+        const yesButton = this.page.locator('button', { hasText: 'Yes' });
+        await yesButton.click();
     }
 }

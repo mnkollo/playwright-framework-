@@ -2,6 +2,7 @@
 import { PageManager } from '../../Page/pageManager'
 import { faker } from '@faker-js/faker'
 import { test } from '../../test-options'
+const fs = require('fs');
 
 let accountName = '';
 
@@ -86,5 +87,26 @@ test.describe('Accounts', () => {
 
       await pm.onAccountsPage().searchAccount(accountName)
       await pm.onAccountsPage().uploadDocument()
+  })
+  test('TC-7460 Verify user can delete document from an account', async ({page}) => {
+    const pm = new PageManager(page)
+    const deletedDocs = 2
+    await pm.onAccountsPage().searchAccount(accountName)
+    await pm.onAccountsPage().deleteDocument(deletedDocs)
+  })
+  test('TC-1054 Verify user can Create Sales Agreement on New Account', async ({page}) => {
+    const pm = new PageManager(page)
+    const contactInfo = JSON.parse(fs.readFileSync('contactData.json', 'utf-8'));   
+    const storedContact = `${contactInfo.firstName} ${contactInfo.lastName}`;
+    const address = 'Physical - 4700 Argonne Dr';
+    const taxIDType = 'Dealer';
+    const bankAccount = 'Pay By Check';
+    const companyName = `${faker.random.words()} Test Company`;
+    const dbaNames = 'Test Company';
+    const payableToName = `${faker.name.fullName()}`;
+    const taxIDNumber = `${faker.random.numeric(9)}`;
+    
+    await pm.onAccountsPage().searchAccount(accountName)
+    await pm.onAccountsPage().createSalesAgreement(storedContact,address,taxIDType, bankAccount, companyName,dbaNames, payableToName, taxIDNumber)
   })
 })
