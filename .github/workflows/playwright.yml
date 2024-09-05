@@ -18,7 +18,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test tests/integration/apiAccounts.spec.ts
+      run: npx playwright test tests/e2e/accounts.spec.ts
     - uses: actions/upload-artifact@v4
       if: always()
       with:
