@@ -15,11 +15,11 @@ require('dotenv').config();
 export default defineConfig<TestOptions>({
   testDir: './tests',
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -37,23 +37,23 @@ export default defineConfig<TestOptions>({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'dev',
-      use: {
-         ...devices['Desktop Chrome'],
-         baseURL: 'https://backoffice-reg.innovallc.com/login'
-        },
-    },
+    // {
+    //   name: 'dev',
+    //   use: {
+    //      ...devices['Desktop Chrome'],
+    //      baseURL: 'https://backoffice-reg.innovallc.com/login'
+    //     },
+    // },
 
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
 
     // {
     //   name: 'webkit',

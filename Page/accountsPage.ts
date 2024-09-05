@@ -42,9 +42,7 @@ export class AccountsPage extends HelperBase {
         fs.writeFileSync('contactData.json', JSON.stringify(contactInfo));
     }
     async addBankAccount(bankName: string, address: string, city: string, accountHolderName: string) {
-        await this.clickToggleButton()
-        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000 })
-        await gearIcon.click()
+        await this.openAccountActionsMenuFromCollectionsView()
         await this.page.locator('a', { hasText: ' Add Bank Account' }).click()
         await this.page.locator('#bankAddress').fill(address)
         await this.page.locator('#bankName').fill(bankName)
@@ -68,9 +66,7 @@ export class AccountsPage extends HelperBase {
         expect(cellValues[7]).toBe(accountHolderName)
     }
     async addNoteToAccount(message: string) {
-        await this.clickToggleButton()
-        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
-        await gearIcon.click()
+        await this.openAccountActionsMenuFromCollectionsView()
         await this.page.locator('a', { hasText: ' Add Internal Note' }).click()
 
         const addAccountNoteModal = this.page.locator('.modal-content', { hasText: 'Add Account Note' })
@@ -248,34 +244,13 @@ export class AccountsPage extends HelperBase {
             await gearIcon.click();
 
             // Click the upload document tab
-            try {
-                await this.page.locator('a', { hasText: ' Upload Document' }).click();
-            } catch (error) {
-                console.error('Failed to click on upload document link:', error);
-                throw error;
-            }
+            await this.page.locator('a', { hasText: ' Upload Document' }).click();
 
-            // Fill in the document description
-            try {
-                await this.page.locator('#description').fill(description[i]);
-            } catch (error) {
-                console.error('Failed to fill document description:', error);
-                throw error;
-            }
-
-            // Select the document type
-            try {
-                await this.page.locator('[name="documentType_ID"]').selectOption(types[i]);
-            } catch (error) {
-                console.error('Failed to select document type:', error);
-                throw error;
-            }
-
-            // Upload the document
+            // Fill in the document description > Select the document type > Upload the document > Save the document
+            await this.page.locator('#description').fill(description[i]);
+            await this.page.locator('[name="documentType_ID"]').selectOption(types[i]);
             const browseLink = await this.page.waitForSelector('[class="filepond--label-action"]', { timeout: 10000 });
             await browseLink.setInputFiles(uploadDocuments[i]);
-
-            // Save the document
             await this.saveButton();
 
             // Verify the document was uploaded
