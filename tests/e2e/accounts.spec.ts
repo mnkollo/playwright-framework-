@@ -18,12 +18,12 @@ test.describe('Actions with Accounts', () => {
     const city = 'SAN ANTONIO'
     const state = 'TX'
     const zip = '78205'
-    accountName = faker.company.name();
+    accountName = faker.company.name() + ' Test Account';
     //testInfo.annotations.push({ type: 'accountName', description: accountName });
 
     await pm.onAccountsPage().createAccount(accountName, randomEmail, firstName, lastName, address, city, state, zip)
   })
-  test.beforeEach('login', async ({ page,login }) => {
+  test.beforeEach('Navigate To Accounts Page', async ({ page,login }) => {
     const pm = new PageManager(page)
     await pm.onHomePage().navigateToAccountsPage()
 

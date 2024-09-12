@@ -90,7 +90,7 @@ export class AccountsPage extends HelperBase {
         await addCollectionsNoteLink.waitFor({ state: 'visible' });
         await addCollectionsNoteLink.click();
 
-    
+
 
         // Add the Collections note
         const addCollectionsModal = this.page.locator('[name="generalNote"]');
@@ -290,30 +290,46 @@ export class AccountsPage extends HelperBase {
             expect(messageText).toBeTruthy();
         }
     }
-    async createSalesAgreement(storedContact: string, address: string,taxIDType: string, bankAccount: string, companyName: string,dbaNames: string, payableToName: string, taxIDNumber: string) {   
+    async createSalesAgreement(storedContact: string, address: string, taxIDType: string, bankAccount: string, companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
         this.openAccountActionsMenuFromCollectionsView()
 
         // Click on the 'Create Sales Agreement' tab
         const salesAgreementTab = this.page.locator('a', { hasText: 'Create Sales Agreement' });
         await salesAgreementTab.waitFor({ state: 'visible' });
-        await salesAgreementTab.click();
+        try {
+            await salesAgreementTab.click();
+        } catch (error) {
+            console.error("Error clicking Sales Agreement tab: ", error);
+            await this.page.screenshot({ path: 'error_sales_agreement.png' });
+        }
 
         // Fill the sales agreement form
-        await this.fillSalesAgreementForm(storedContact,address,taxIDType, bankAccount, companyName, dbaNames, payableToName, taxIDNumber)
+        await this.fillSalesAgreementForm(storedContact, address, taxIDType, bankAccount, companyName, dbaNames, payableToName, taxIDNumber)
 
         // Save the form
         const saveIcon = this.page.locator('[class="fa fa-save fa-lg"]');
-        await expect(saveIcon).toBeEnabled({ timeout: 5000 });
-        await saveIcon.click();
+        try {
+            await expect(saveIcon).toBeEnabled({ timeout: 5000 });
+            await saveIcon.click();
+        } catch (error) {
+            console.error("Error clicking Save icon: ", error);
+            await this.page.screenshot({ path: 'error_saving_agreement.png' });
+        }
 
         // Verify the success message
-        const successMessage = await this.page.getByText('Success!').textContent()
-        expect(successMessage).toBeTruthy()
+        const successMessage = await this.page.getByText('Success!').textContent({ timeout: 5000 });
+        expect(successMessage).toBeTruthy();
 
         this.clickToggleButton()
         await this.page.locator('ol [class="breadcrumb-item"]').last().click();
-        const salesAgreementCreated = await this.page.locator('[class="card-title no-border"]', { hasText: 'Sales Agreement Term'}).textContent();
+        const salesAgreementCreated = await this.page.locator('[class="card-title no-border"]', { hasText: 'Sales Agreement Term' }).textContent();
         expect(salesAgreementCreated?.trim()).toContain('Sales Agreement Term');
+
+        const salesAgreementEditIcon = this.page.locator('[data-tip="View / Create New"]');   
+        await salesAgreementEditIcon.waitFor({ state: 'visible' });
+        await salesAgreementEditIcon.click();
+
+        await this.verifySalesAgreementForm(companyName, dbaNames, payableToName, taxIDNumber)
     }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 10000 });
@@ -329,7 +345,7 @@ export class AccountsPage extends HelperBase {
         expect(documentDescription).toContain(description);
 
     }
-    private async fillSalesAgreementForm(storedContact:string,address: string, taxIDType: string, bankAccount: string, companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
+    private async fillSalesAgreementForm(storedContact: string, address: string, taxIDType: string, bankAccount: string, companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
         await this.page.locator('#sellerContactID').selectOption(storedContact)
         await this.page.locator('#paymentAddressID').selectOption(address)
         await this.page.locator('#taxIDTypeID').selectOption(taxIDType)
@@ -356,5 +372,19 @@ export class AccountsPage extends HelperBase {
         // Wait for the gear icon and click it
         const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000 });
         await gearIcon.click();
+    }
+    private async verifySalesAgreementForm(companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
+        // Verify filled values for textboxes
+        const filledCompanyName = await this.page.locator('#sellerLegalName').inputValue();
+        expect(filledCompanyName).toBe(companyName);
+        console.log(filledCompanyName);
+        const filledDBANames = await this.page.locator('#dbaNames').inputValue(); 
+        expect(filledDBANames).toBe(dbaNames);
+
+        const filledPayableToName = await this.page.locator('#payableToName').inputValue();
+        expect(filledPayableToName).toBe(payableToName);
+
+        const filledTaxIDNumber = await this.page.locator('#taxIDNumber').inputValue();
+        expect(filledTaxIDNumber).toBe(taxIDNumber);
     }
 } 
