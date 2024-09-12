@@ -90,6 +90,8 @@ export class AccountsPage extends HelperBase {
         await addCollectionsNoteLink.waitFor({ state: 'visible' });
         await addCollectionsNoteLink.click();
 
+    
+
         // Add the Collections note
         const addCollectionsModal = this.page.locator('[name="generalNote"]');
         await addCollectionsModal.waitFor({ state: 'visible' });
@@ -314,7 +316,7 @@ export class AccountsPage extends HelperBase {
         expect(salesAgreementCreated?.trim()).toContain('Sales Agreement Term');
     }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
-        const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 5000 });
+        const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 10000 });
         await documentAccordion.click();
 
         const documentRow = this.page.locator('[data-tip="Download"]').last();

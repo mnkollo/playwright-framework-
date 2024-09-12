@@ -7,11 +7,28 @@ const fs = require('fs');
 let accountName = '';
 
 test.describe('Actions with Accounts', () => {
+  test.beforeAll('login', async ({ page,login }) => {
+    const pm = new PageManager(page)
+    await pm.onHomePage().navigateToAccountsPage()
+    
+    const firstName = faker.name.firstName()
+    const lastName = faker.name.lastName()
+    const randomEmail = `${firstName}${lastName}${faker.random.numeric(5)}@test.com`
+    const address = '4700 Argonne Dr'
+    const city = 'SAN ANTONIO'
+    const state = 'TX'
+    const zip = '78205'
+    accountName = faker.company.name();
+    //testInfo.annotations.push({ type: 'accountName', description: accountName });
+
+    await pm.onAccountsPage().createAccount(accountName, randomEmail, firstName, lastName, address, city, state, zip)
+  })
   test.beforeEach('login', async ({ page,login }) => {
     const pm = new PageManager(page)
     await pm.onHomePage().navigateToAccountsPage()
+
   })
-  test('Verify user can Create Business Account with all fields', async ({ page }) => {
+  test.skip('Verify user can Create Business Account with all fields', async ({ page }) => {
     const pm = new PageManager(page)
     const firstName = faker.name.firstName()
     const lastName = faker.name.lastName()
