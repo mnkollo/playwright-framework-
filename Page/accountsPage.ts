@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test'
 import { HelperBase } from './helperBase'
 import { faker } from '@faker-js/faker'
-const fs = require('fs');
+const fsPromises = require('fs').promises;
 
 
 
@@ -10,7 +10,6 @@ export class AccountsPage extends HelperBase {
     constructor(page: Page) {
         super(page)
     }
-
     async createAccount(name: string, email: string, firstName: string, lastName: string, address: string, city: string, state: string, zip: string) {
         await this.page.click('[class="fa fa-plus fa-lg"]')
         await this.page.locator('#search_string').fill(name)
@@ -18,7 +17,7 @@ export class AccountsPage extends HelperBase {
         await this.page.getByText('Create New Account').click()
 
         //Check breadcrumb
-        expect(await this.page.locator('.breadcrumb').textContent()).toBe('AccountsCreate Account')
+        await this.verifyBreadcrumbs('AccountsCreate Account')
 
         //Enter Data In Create Account Form
         await this.page.locator('#contactEmail').fill(email)
@@ -31,7 +30,7 @@ export class AccountsPage extends HelperBase {
         await this.page.waitForTimeout(1000)
 
         //Check breadcrumb
-        expect(await this.page.locator('.breadcrumb').textContent()).toBe('AccountsAccount')
+        await this.verifyBreadcrumbs('AccountsAccount')
 
         //Verify Account Created
         const accountName = await this.page.locator('.d-flex', { hasText: name }).textContent();
@@ -39,11 +38,10 @@ export class AccountsPage extends HelperBase {
 
         // Save the contact info to a file
         const contactInfo = { firstName, lastName };
-        fs.writeFileSync('contactData.json', JSON.stringify(contactInfo));
+        await fsPromises.writeFile('contactData.json', JSON.stringify(contactInfo));
     }
     async addBankAccount(bankName: string, address: string, city: string, accountHolderName: string) {
-        await this.openAccountActionsMenuFromCollectionsView()
-        await this.page.locator('a', { hasText: ' Add Bank Account' }).click()
+        await this.openAccountActionsAndSelectOption(' Add Bank Account')
         await this.page.locator('#bankAddress').fill(address)
         await this.page.locator('#bankName').fill(bankName)
         await this.page.locator('#bankCity').fill(city)
@@ -66,8 +64,7 @@ export class AccountsPage extends HelperBase {
         expect(cellValues[7]).toBe(accountHolderName)
     }
     async addNoteToAccount(message: string) {
-        await this.openAccountActionsMenuFromCollectionsView()
-        await this.page.locator('a', { hasText: ' Add Internal Note' }).click()
+        await this.openAccountActionsAndSelectOption(' Add Internal Note')
 
         const addAccountNoteModal = this.page.locator('.modal-content', { hasText: 'Add Account Note' })
         await addAccountNoteModal.locator('[name="text"]').fill(message)
@@ -89,8 +86,6 @@ export class AccountsPage extends HelperBase {
         const addCollectionsNoteLink = this.page.locator('a', { hasText: 'Add Collections Note' });
         await addCollectionsNoteLink.waitFor({ state: 'visible' });
         await addCollectionsNoteLink.click();
-
-
 
         // Add the Collections note
         const addCollectionsModal = this.page.locator('[name="generalNote"]');
@@ -177,8 +172,7 @@ export class AccountsPage extends HelperBase {
         const saveButton = this.page.locator('button', { hasText: 'Save' })
         if (await saveButton.isEnabled()) {
             await saveButton.click()
-            const successMessage = await this.page.getByText('Success!').textContent()
-            expect(successMessage).toBeTruthy()
+            await this.verifySuccessMessage();
         } else {
             // If save button is not enabled, handle the scenario by cancelling
             await this.page.locator('button', { hasText: 'Cancel' }).click()
@@ -283,25 +277,11 @@ export class AccountsPage extends HelperBase {
             await this.yesButton();
 
             // Verify the success message appears after each deletion
-            const successMessage = await this.page.waitForSelector('text=Success!', { state: 'visible' });
-            const messageText = await successMessage.textContent();
-
-            // Assert the success message is shown
-            expect(messageText).toBeTruthy();
+            await this.verifySuccessMessage();
         }
     }
     async createSalesAgreement(storedContact: string, address: string, taxIDType: string, bankAccount: string, companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
-        this.openAccountActionsMenuFromCollectionsView()
-
-        // Click on the 'Create Sales Agreement' tab
-        const salesAgreementTab = this.page.locator('a', { hasText: 'Create Sales Agreement' });
-        await salesAgreementTab.waitFor({ state: 'visible' });
-        try {
-            await salesAgreementTab.click();
-        } catch (error) {
-            console.error("Error clicking Sales Agreement tab: ", error);
-            await this.page.screenshot({ path: 'error_sales_agreement.png' });
-        }
+        await this.openAccountActionsAndSelectOption(' Create Sales Agreement')
 
         // Fill the sales agreement form
         await this.fillSalesAgreementForm(storedContact, address, taxIDType, bankAccount, companyName, dbaNames, payableToName, taxIDNumber)
@@ -317,19 +297,48 @@ export class AccountsPage extends HelperBase {
         }
 
         // Verify the success message
-        const successMessage = await this.page.getByText('Success!').textContent({ timeout: 5000 });
-        expect(successMessage).toBeTruthy();
+        await this.verifySuccessMessage();
 
         this.clickToggleButton()
         await this.page.locator('ol [class="breadcrumb-item"]').last().click();
         const salesAgreementCreated = await this.page.locator('[class="card-title no-border"]', { hasText: 'Sales Agreement Term' }).textContent();
         expect(salesAgreementCreated?.trim()).toContain('Sales Agreement Term');
 
-        const salesAgreementEditIcon = this.page.locator('[data-tip="View / Create New"]');   
+        const salesAgreementEditIcon = this.page.locator('[data-tip="View / Create New"]');
         await salesAgreementEditIcon.waitFor({ state: 'visible' });
         await salesAgreementEditIcon.click();
 
         await this.verifySalesAgreementForm(companyName, dbaNames, payableToName, taxIDNumber)
+    }
+    async uploadTaxExemptDocument(exemptionType: string, uploadDocuments: string) {
+        await this.openAccountActionsAndSelectOption(' Upload Tax Exemption')
+
+        await this.page.locator('[name="type_ID"]').selectOption(exemptionType)
+
+        const browseLink = await this.page.waitForSelector('[class="filepond--label-action"]', { timeout: 10000 });
+        try {
+            await browseLink.setInputFiles(uploadDocuments);
+        } catch (error) {
+            console.error("Error uploading document: ", error);
+            await this.page.screenshot({ path: 'error_uploading_document.png' });
+        }
+
+        await this.saveButton();
+        await this.verifySuccessMessage();
+
+        await this.clickToggleButton();
+        await this.page.locator('#accountAudits').click();
+        try {
+            const documentRow = this.page.locator('tbody', { hasText: 'Automation Account' }).first();
+            await documentRow.waitFor({ state: 'attached', timeout: 5000 });
+
+            const documentActivity = await documentRow.locator('td').nth(2).textContent();
+            expect(documentActivity).toContain('Document Uploaded');
+        } catch (error) {
+            console.error("Error verifying document activity in the audit trail: ", error);
+            await this.page.screenshot({ path: 'error_verifying_audit.png' });
+        }
+
     }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 10000 });
@@ -365,7 +374,7 @@ export class AccountsPage extends HelperBase {
             await fieldLocator.locator('.input-xs').fill(value);
         }
     }
-    private async openAccountActionsMenuFromCollectionsView() {
+    private async openAccountActionsMenuFromAccountView() {
         // Click on toggle button
         await this.clickToggleButton()
 
@@ -378,7 +387,7 @@ export class AccountsPage extends HelperBase {
         const filledCompanyName = await this.page.locator('#sellerLegalName').inputValue();
         expect(filledCompanyName).toBe(companyName);
         console.log(filledCompanyName);
-        const filledDBANames = await this.page.locator('#dbaNames').inputValue(); 
+        const filledDBANames = await this.page.locator('#dbaNames').inputValue();
         expect(filledDBANames).toBe(dbaNames);
 
         const filledPayableToName = await this.page.locator('#payableToName').inputValue();
@@ -386,5 +395,10 @@ export class AccountsPage extends HelperBase {
 
         const filledTaxIDNumber = await this.page.locator('#taxIDNumber').inputValue();
         expect(filledTaxIDNumber).toBe(taxIDNumber);
+    }
+    private async openAccountActionsAndSelectOption(optionText: string) {
+        await this.openAccountActionsMenuFromAccountView();
+        await this.page.locator('a', { hasText: optionText }).waitFor({ state: 'visible' });
+        await this.page.locator('a', { hasText: optionText }).click();
     }
 } 

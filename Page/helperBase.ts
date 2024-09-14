@@ -1,4 +1,4 @@
-import {Page} from '@playwright/test'
+import {Page,expect} from '@playwright/test'
 
 export class HelperBase {
     readonly page: Page
@@ -20,5 +20,13 @@ export class HelperBase {
     async yesButton(){
         const yesButton = this.page.locator('button', { hasText: 'Yes' });
         await yesButton.click();
+    }
+    async verifyBreadcrumbs(expectedBreadcrumb: string) {
+        const breadcrumbText = await this.page.locator('.breadcrumb').textContent();
+        expect(breadcrumbText?.trim()).toBe(expectedBreadcrumb);
+    }
+    async verifySuccessMessage(message: string = 'Success!') {
+        const successMessage = await this.page.getByText(message).textContent({ timeout: 5000 });
+        expect(successMessage).toBeTruthy();
     }
 }
