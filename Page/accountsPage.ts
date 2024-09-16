@@ -1,6 +1,8 @@
 import { Page, expect } from '@playwright/test'
 import { HelperBase } from './helperBase'
 import { faker } from '@faker-js/faker'
+import * as path from 'path'; // Import the path module
+
 const fsPromises = require('fs').promises;
 
 
@@ -79,9 +81,7 @@ export class AccountsPage extends HelperBase {
         await this.page.locator('[class="a-table"]', { hasText: accountName }).first().click()
     }
     async addCollectionsNoteToAccount(message: string) {
-        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]')
-        await gearIcon.click()
-
+        await this.clickGearIcon()
         // Wait for the 'Add Collections Note' link to be visible and click it
         const addCollectionsNoteLink = this.page.locator('a', { hasText: 'Add Collections Note' });
         await addCollectionsNoteLink.waitFor({ state: 'visible' });
@@ -186,10 +186,7 @@ export class AccountsPage extends HelperBase {
     async verifyAbleToCreateLocation(type: string, name: string, address: string, city: string, state: string, zip: string, phone: string) {
         // Click on toggle button
         await this.clickToggleButton()
-
-        // Wait for the gear icon and click it
-        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000 });
-        await gearIcon.click();
+        await this.clickGearIcon()
 
         //Navigate To Location Modal
         try {
@@ -226,7 +223,7 @@ export class AccountsPage extends HelperBase {
     }
     async uploadDocument() {
         await this.clickToggleButton();
-        const uploadDocuments = ['tests/uploadFiles/beigeCouch.png', 'tests/uploadFiles/livingRoomIdeas.png'];
+        const uploadDocuments = [path.resolve(__dirname, '../testData/uploadFiles/beigeCouch.png'), path.resolve(__dirname, '../testData/uploadFiles/livingRoomIdeas.png')];
         const types = ['Copy Of Title', 'Contract'];
         const description = [faker.random.words(2), faker.random.words(3)];
 
@@ -340,6 +337,29 @@ export class AccountsPage extends HelperBase {
         }
 
     }
+    async acceptDeposit(amount: string, method: string) {
+        await this.clickGearIcon();
+        
+        // Wait for and click on 'Accept Deposit' tab
+        const acceptDepositTab = this.page.locator('a', { hasText: 'Accept Deposit' });
+        await acceptDepositTab.waitFor({ state: 'visible' });
+        await acceptDepositTab.click();
+      
+        // Enter amount and select deposit method
+        await this.page.locator('#amount').fill(amount);
+        await this.page.locator('[name="method_ID"]').selectOption(method);
+        await this.saveButton();
+      
+        // Wait for the deposit card to appear
+        const depositCard = this.page.locator('.card-body-account', { hasText: 'Deposit Balance' });
+        await depositCard.waitFor({ state: 'visible' });
+      
+        // Get the text content of the deposit balance
+        const balanceText = await depositCard.locator('h5.card-name-account').textContent();
+      
+        // Log the extracted balance
+        console.log(balanceText); // This should now print something like "$50.00"
+      }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 10000 });
         await documentAccordion.click();
@@ -377,10 +397,7 @@ export class AccountsPage extends HelperBase {
     private async openAccountActionsMenuFromAccountView() {
         // Click on toggle button
         await this.clickToggleButton()
-
-        // Wait for the gear icon and click it
-        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000 });
-        await gearIcon.click();
+        await this.clickGearIcon()
     }
     private async verifySalesAgreementForm(companyName: string, dbaNames: string, payableToName: string, taxIDNumber: string) {
         // Verify filled values for textboxes

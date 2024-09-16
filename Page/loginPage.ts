@@ -23,10 +23,6 @@ export class LoginPage extends HelperBase {
         const header = await this.page.locator('.breadcrumb').textContent()
         expect(header).toBe('DashboardDashboard Not Configured')
     }   
-    async navigateToAccountsPage(){
-        await this.page.locator('[href="/crm/accounts"]').click()
-
-    }
     async navigateToPacakagePage(){
  
     }

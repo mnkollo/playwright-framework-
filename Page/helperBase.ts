@@ -29,4 +29,9 @@ export class HelperBase {
         const successMessage = await this.page.getByText(message).textContent({ timeout: 5000 });
         expect(successMessage).toBeTruthy();
     }
+    async clickGearIcon(){
+        // Wait for the gear icon and click it
+        const gearIcon = await this.page.waitForSelector('[class="fa fa-cogs"]', { timeout: 5000 });
+        await gearIcon.click();
+    }
 }
