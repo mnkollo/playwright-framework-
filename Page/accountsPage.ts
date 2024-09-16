@@ -417,5 +417,5 @@ export class AccountsPage extends HelperBase {
         await this.openAccountActionsMenuFromAccountView();
         await this.page.locator('a', { hasText: optionText }).waitFor({ state: 'visible' });
         await this.page.locator('a', { hasText: optionText }).click();
-    }
+    } 
 } 
