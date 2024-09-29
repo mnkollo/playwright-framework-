@@ -355,8 +355,9 @@ export class AccountsPage extends HelperBase {
         await depositCard.waitFor({ state: 'visible' });
       
         // Get the text content of the deposit balance
-        const balanceText = await depositCard.locator('h5.card-name-account').nth(2).textContent();
-        
+        await this.page.waitForTimeout(1000)
+        const balanceText = await this.page.locator('h5.card-name-account').nth(2).textContent();
+        expect(balanceText).toContain(amount);
       }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 10000 });

@@ -84,7 +84,7 @@ test.describe('Actions with Accounts', () => {
     
     await pm.onAccountsPage().uploadTaxExemptDocument(exemptType, filePath)
   })
-  test.only('TC-2759 Verify user can apply Deposit by Wire Transfer to account', async ({page}) => {
+  test('TC-2759 Verify user can apply Deposit by Wire Transfer to account', async ({page}) => {
     const pm = new PageManager(page)
 
     await pm.onAccountsPage().acceptDeposit('50.00','Wire Transfer')
