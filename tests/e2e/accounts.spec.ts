@@ -86,7 +86,9 @@ test.describe('Actions with Accounts', () => {
   })
   test('TC-2759 Verify user can apply Deposit by Wire Transfer to account', async ({page}) => {
     const pm = new PageManager(page)
+    let money = testData.generatAccountData()
 
-    await pm.onAccountsPage().acceptDeposit('50.00','Wire Transfer')
+    await pm.onAccountsPage().acceptDeposit(money.price,'Wire Transfer')
+    await pm.onAccountsPage().depositCreated('$50.00 DEPOSIT APPLIED')
   })
 })

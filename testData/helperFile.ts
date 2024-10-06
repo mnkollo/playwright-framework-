@@ -50,6 +50,11 @@ export const generateSalesAgreementData = () => {
     taxIDNumber: `${faker.random.numeric(9)}`
   };
 };
+export const generatAccountData = () => {
+  return {
+    price: '50.00',
+  };
+};
 export const generateBankAccountData = () => {
   return {
     bankName: 'Chase',

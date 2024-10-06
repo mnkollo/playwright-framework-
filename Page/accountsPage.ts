@@ -359,6 +359,12 @@ export class AccountsPage extends HelperBase {
         const balanceText = await this.page.locator('h5.card-name-account').nth(2).textContent();
         expect(balanceText).toContain(amount);
       }
+      async depositCreated(deposit: string){
+        await this.clickToggleButton();
+        const validateNote = await this.page.locator('[class="Linkify"] p').first().textContent();
+        expect(validateNote).toContain(deposit);
+
+      }
     private async verifyDocumentUpload(type: unknown, description: unknown) {
         const documentAccordion = await this.page.waitForSelector('#documents', { timeout: 10000 });
         await documentAccordion.click();
